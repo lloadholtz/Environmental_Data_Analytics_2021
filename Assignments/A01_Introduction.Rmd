@@ -1,6 +1,6 @@
 ---
 title: "Assignment 1: Introduction"
-author: "Student Name"
+author: Logan Loadholtz
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -22,21 +22,21 @@ The completed exercise is due on <>.
 
 1. What are your previous experiences with data analytics, R, and Git? Include both formal and informal training.
 
-> Answer: 
+> Answer: I have taken ENV 710 Applied Data Analysis with Betsy Albright. We had a brief introduction to R in this class and an overview of statistics.
 
 2. Are there any components of the course about which you feel confident?
 
-> Answer: 
+> Answer: I do not feel fully confident in any part of R but since I have a general background from ENV710, I am excited to get back into it and really improve on my baseline knowledge. I think that just since its been a while since I took stats, that I will get up to speed.
 
 3. Are there any components of the course about which you feel apprehensive?
 
-> Answer: 
+> Answer: I am worried about the online format of the class. Also, I am worried about the final project but I know once I learn all the skills from class I will be able to accomplish it.
 
 
 ## 2) GitHub
 
 Provide a link below to your forked course repository in GitHub. Make sure you have pulled all recent changes from the course repository  and that you have updated your course README file. 
 
-> Answer: 
+> Answer: https://github.com/lloadholtz/Environmental_Data_Analytics_2021.git
 
 
