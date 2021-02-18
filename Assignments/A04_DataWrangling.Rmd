@@ -1,6 +1,6 @@
 ---
 title: "Assignment 4: Data Wrangling"
-author: "Student Name"
+author: "Logan Loadholtz"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -25,8 +25,38 @@ The completed exercise is due on Tuesday, Feb 16 @ 11:59pm.
 
 ```{r, message = FALSE}
 #1
+getwd()
+library(tidyverse)
+library(lubridate)
+
+library(knitr)
+opts_chunk$set(tidy.opts=list(width.cutoff=50),tidy=TRUE)
+
+EPAair_PM25_NC2019 <- read.csv("~/Documents/DATA/Environmental_Data_Analytics_2021/Data/Raw/EPAair_PM25_NC2019_raw.csv",
+                               stringsAsFactors = FALSE)
+
+EPAair_PM25_NC2018 <- read.csv("~/Documents/DATA/Environmental_Data_Analytics_2021/Data/Raw/EPAair_PM25_NC2018_raw.csv",
+                               stringsAsFactors = FALSE)
+
+EPAair_O3_NC2019 <-read.csv("~/Documents/DATA/Environmental_Data_Analytics_2021/Data/Raw/EPAair_O3_NC2019_raw.csv",
+                            stringsAsFactors = FALSE)
+
+EPAair_O3_NC2018 <-read.csv("~/Documents/DATA/Environmental_Data_Analytics_2021/Data/Raw/EPAair_O3_NC2018_raw.csv",
+                            stringsAsFactors = FALSE)
 
 #2
+dim(EPAair_PM25_NC2018)
+dim(EPAair_PM25_NC2019)
+dim(EPAair_O3_NC2018)
+dim(EPAair_O3_NC2019)
+#all datasets have 20 columns, so that is good for us to see that they are all containing 
+#the same information
+
+colnames(EPAair_PM25_NC2018)
+#I will just take column names of the first set here
+
+str(EPAair_PM25_NC2018, width=80, strict.width="cut")
+
 ```
 
 ## Wrangle individual datasets to create processed files.
@@ -37,12 +67,57 @@ The completed exercise is due on Tuesday, Feb 16 @ 11:59pm.
 
 ```{r}
 #3
+class(EPAair_O3_NC2018$Date)
+#Here, we can see that date is a factor variable. We will need to change that to date
+
+EPAair_O3_NC2018$Date <- as.Date(EPAair_O3_NC2018$Date, format = "%m/%d/%Y") 
+class(EPAair_O3_NC2018$Date)
+
+EPAair_O3_NC2019$Date <- as.Date(EPAair_O3_NC2019$Date, format = "%m/%d/%Y") 
+class(EPAair_O3_NC2019$Date)
+
+EPAair_PM25_NC2018$Date <- as.Date(EPAair_PM25_NC2018$Date, format = "%m/%d/%Y") 
+class(EPAair_PM25_NC2018$Date)
+
+EPAair_PM25_NC2019$Date <- as.Date(EPAair_PM25_NC2019$Date, format = "%m/%d/%Y") 
+class(EPAair_PM25_NC2019$Date)
 
 #4
+EPAair_O3_NC2018_select <- select(EPAair_O3_NC2018, Date, DAILY_AQI_VALUE, Site.Name, 
+                                  AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+
+EPAair_O3_NC2019_select <- select(EPAair_O3_NC2019, Date, DAILY_AQI_VALUE, Site.Name, 
+                                  AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+
+EPAair_PM25_NC2018_select <- select(EPAair_PM25_NC2018, Date, DAILY_AQI_VALUE, Site.Name, 
+                                    AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+
+EPAair_PM25_NC2019_select <- select(EPAair_PM25_NC2019, Date, DAILY_AQI_VALUE, Site.Name, 
+                                    AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
 #5
 
+EPAair_PM25_NC2018_select <- mutate(EPAair_PM25_NC2018_select, AQS_PARAMETER_DESC = "PM2.5")
+
+EPAair_PM25_NC2019_select <- mutate(EPAair_PM25_NC2019_select, AQS_PARAMETER_DESC = "PM2.5")
+
 #6
+write.csv(EPAair_PM25_NC2018_select, row.names = FALSE, file=
+            "~/Documents/DATA/Environmental_Data_Analytics_2021/Data/Processed/
+          EPAair_PM25_NC2018_select_Processed.csv")
+
+write.csv(EPAair_PM25_NC2019_select, row.names = FALSE, file=
+            "~/Documents/DATA/Environmental_Data_Analytics_2021/Data/Processed/
+          EPAair_PM25_NC2019_select_Processed.csv")
+
+write.csv(EPAair_O3_NC2018_select, row.names = FALSE, file=
+            "~/Documents/DATA/Environmental_Data_Analytics_2021/Data/Processed/
+          EPAair_O3_NC2018_select_Processed.csv")
+
+write.csv(EPAair_O3_NC2019_select, row.names = FALSE, file=
+            "~/Documents/DATA/Environmental_Data_Analytics_2021/Data/Processed/
+          EPAair_O3_NC2019_select_Processed.csv")
+
 
 ```
 
@@ -62,15 +137,37 @@ The completed exercise is due on Tuesday, Feb 16 @ 11:59pm.
 
 ```{r}
 #7
+AirQuality_O3_PM25 <- rbind(EPAair_O3_NC2018_select, EPAair_O3_NC2019_select,
+                            EPAair_PM25_NC2018_select, EPAair_PM25_NC2019_select)
 
 #8
+AirQuality_O3_PM25_processed <- 
+  AirQuality_O3_PM25 %>%
+  filter(Site.Name %in% c("Linville Falls", "Durham Armory","Leggett", "Hattie Avenue",
+                          "Clemmons Middle", "Mendenhall School", "Frying Pan Mountain", 
+                          "West Johnston Co.", "Garinger High School", "Castle Hayne", 
+                          "Pitt Agri. Center", "Bryson City", "Millbrook School") ) %>%
+  group_by(Date, Site.Name, AQS_PARAMETER_DESC, COUNTY) %>%
+  filter(!is.na(DAILY_AQI_VALUE) & !is.na(SITE_LATITUDE) & !is.na(SITE_LONGITUDE)) %>%
+  summarise(meanAQI = mean(DAILY_AQI_VALUE),
+            meanlat= mean(SITE_LATITUDE),
+            meanlong= mean(SITE_LONGITUDE),) %>%
+  mutate(month=month(Date)) %>%
+  mutate(year=year(Date))
+  
 
 #9
 
+AirQuality_O3_PM25_wide <- pivot_wider(AirQuality_O3_PM25_processed, names_from =AQS_PARAMETER_DESC, 
+                                       values_from = meanAQI)
 #10
+dim(AirQuality_O3_PM25_wide)
+
 
 #11
-
+write.csv(AirQuality_O3_PM25_wide, row.names = FALSE, file=
+            "~/Documents/DATA/Environmental_Data_Analytics_2021/Data/Processed/
+          EPAair_O3_PM25_NC1718_Processed.csv")
 ```
 
 
@@ -81,13 +178,23 @@ The completed exercise is due on Tuesday, Feb 16 @ 11:59pm.
 
 ```{r}
 #12a
-
+Summary_AirQuality_O3_PM25_wide <-
+  AirQuality_O3_PM25_wide %>%
+  group_by(Site.Name, month, year) %>%
+  summarise(meanO3 = mean(Ozone),
+            meanPM25 =mean(PM2.5)) 
+  
 #12b
+Summary_AirQuality_O3_PM25_wide_removeNA <-
+  Summary_AirQuality_O3_PM25_wide %>%
+  drop_na(month, year)
+
+
 
 #13
-
+dim(Summary_AirQuality_O3_PM25_wide_removeNA)
 ```
 
 14. Why did we use the function `drop_na` rather than `na.omit`?
 
-> Answer: 
+> Answer: drop_na is used for specific columns. Here, we specified that we want to remove rows with NA values from the month and year column. na.omit drops NA values from the whole dataframe.

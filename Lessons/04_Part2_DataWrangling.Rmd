@@ -38,6 +38,7 @@ NTL.phys.data.PeterPaul$sampledate <- as.Date(NTL.phys.data.PeterPaul$sampledate
 
 # Select Peter and Paul Lakes from the nutrient dataset
 NTL.nutrient.data.PeterPaul <- filter(NTL.nutrient.data, lakename == "Paul Lake" | lakename == "Peter Lake")
+#choosing data from peter and paul lake from the nutrient dataset
 
 # Data summaries for nutrient data
 colnames(NTL.nutrient.data.PeterPaul)
@@ -46,6 +47,7 @@ str(NTL.nutrient.data.PeterPaul)
 summary(NTL.nutrient.data.PeterPaul$lakename) 
 # Notice that other lake names didn't go away, even though they have zero values
 NTL.nutrient.data.PeterPaul <- droplevels(NTL.nutrient.data.PeterPaul)
+#gets rid of the zero values when using code in line 47
 summary(NTL.nutrient.data.PeterPaul$lakename)
 summary(NTL.nutrient.data.PeterPaul$comments)
 class(NTL.nutrient.data.PeterPaul$sampledate)
@@ -56,6 +58,7 @@ NTL.nutrient.data.PeterPaul <-
   mutate(month = month(sampledate)) %>% #
   select(lakeid:daynum, month, sampledate:comments) %>% # 
   drop_na(depth)
+#using the pipe method
 
 # Save processed nutrient file
 write.csv(NTL.nutrient.data.PeterPaul, row.names = FALSE, 
@@ -64,9 +67,11 @@ write.csv(NTL.nutrient.data.PeterPaul, row.names = FALSE,
 # Remove columns that are not of interest for analysis
 NTL.phys.data.PeterPaul.subset <- select(NTL.phys.data.PeterPaul, 
                                          lakename:irradianceDeck)
-  
+  #removing lakeID column
+
 NTL.nutrient.data.PeterPaul.subset <- select(NTL.nutrient.data.PeterPaul, 
                                              lakename, year4, daynum, month, sampledate, depth:po4)
+#removed lakeid, month, depth ID
 
 # write a more succinct line of code to subset the nutrient dataset. 
 
@@ -90,9 +95,11 @@ We will work with the new functions from `tidyr`. For gather we will use `pivot_
 
 # Gather nutrient data into one column using pivot_longer
 NTL.nutrient.data.PeterPaul.gathered <- pivot_longer(NTL.nutrient.data.PeterPaul.subset,tn_ug:po4, names_to = "nutrient", values_to = "concentration")
+#assign a new variable, function is pivot_longer, create a column called nutrient, second columnn called values_to 
 
 NTL.nutrient.data.PeterPaul.gathered <- subset(NTL.nutrient.data.PeterPaul.gathered, !is.na(concentration))
 count(NTL.nutrient.data.PeterPaul.gathered, nutrient)
+#remove the rows that have NA in concentration column
 
 write.csv(NTL.nutrient.data.PeterPaul.gathered, row.names = FALSE, 
           file = "./Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaulGathered_Processed.csv")
@@ -151,16 +158,21 @@ However, there are 20 months in this dataset, so importing all these files indiv
 
 ```{r}
 LitterFiles = list.files(path = "./Data/Raw/NIWO_Litter/", pattern="*.csv", full.names=TRUE)
+#creating a list. specify a path to the folder where the files are located. pattern are the files you want to read. and we want to read the full names of the files.
 LitterFiles
 
 Litter <- LitterFiles %>%
   ldply(read.csv)
+#use a pipe to read each element on that file
 ```
 
 We also have information about individual traps, including the location and type of landcover. Let's join these two datasets. Note that "siteID", "plotID" and "trapID" exist in both datasets, and we can join them by these conditions. Notice the dimensions of the final dataset.
 ```{r}
 Trap <- read.csv("./Data/Raw/NEON_NIWO_Litter_trapdata_raw.csv")
+#import the trap data
+
 LitterTrap <- left_join(Litter, Trap, by = c("siteID", "plotID", "trapID"))
+#join them by these conditions
 
 dim(Litter)
 dim(Trap)
@@ -168,6 +180,7 @@ dim(LitterTrap)
 
 LitterTrap <- LitterTrap %>%
   select(plotID:trapID, collectDate, functionalGroup:qaDryMass, subplotID:geodeticDatum)
+#use select function with the pipe
 
 write.csv(LitterTrap, row.names = FALSE, 
           file ="./Data/Processed/NEON_NIWO_Litter_mass_trap_Processed.csv")
@@ -189,6 +202,8 @@ NTL.PeterPaul.summaries <-
             sdTN = sd(tn_ug), 
             meanTP = mean(tp_ug), 
             sdTP = sd(tp_ug))
+#filter by depth first, then group by lake name and month, filter NA for temp, and tn_ug, and tp_ug, use & so there is a row where none of these are there. summarize mean temp and sd, 
+
 
 write.csv(NTL.PeterPaul.summaries, row.names = FALSE, 
           file ="./Data/Processed/NTL-LTER_Lake_Summaries_PeterPaul_Processed.csv")

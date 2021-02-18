@@ -1,9 +1,7 @@
 ---
-title: 'Assignment 3: Data Exploration'
-author: "Logan Loadholtz"
-output:
-  pdf_document: default
-  word_document: default
+title: "Assignment 3: Data Exploration"
+author: Logan Loadholtz
+output: pdf_document
 geometry: margin=2.54cm
 ---
 
@@ -25,20 +23,16 @@ The completed exercise is due on <>.
 
 1. Check your working directory, load necessary packages (tidyverse), and upload two datasets: the ECOTOX neonicotinoid dataset (ECOTOX_Neonicotinoids_Insects_raw.csv) and the Niwot Ridge NEON dataset for litter and woody debris (NEON_NIWO_Litter_massdata_2018-08_raw.csv). Name these datasets "Neonics" and "Litter", respectively. 
 ```{r,  message = FALSE}
-getwd()
 
+
+getwd()
 #Here I am checking the working directory by using getwd()
-#install.packages("tidyverse")
+install.packages("tidyverse")
 library(tidyverse)
 
-Neonics <- read.csv("~/Documents/DATA/Environmental_Data_Analytics_2021/Data/Raw/ECOTOX_Neonicotinoids_Insects_raw.csv", stringsAsFactor=TRUE)
+Neonics <- ECOTOX_Neonicotinoids_Insects_raw
 
-
-#Neonics <- ECOTOX_Neonicotinoids_Insects_raw
-
-Litter <- read.csv("~/Documents/DATA/Environmental_Data_Analytics_2021/Data/Raw/NEON_NIWO_Litter_massdata_2018-08_raw.csv", stringsAsFactor=TRUE)
-
-#Litter <- NEON_NIWO_Litter_massdata_2018.08_raw
+Litter <- NEON_NIWO_Litter_massdata_2018.08_raw
 ```
 
 ## Learn about your system
@@ -58,6 +52,8 @@ Litter <- read.csv("~/Documents/DATA/Environmental_Data_Analytics_2021/Data/Raw/
 *Litter is defined as material with a butt end diameter <2cm and length <50 cm. Fine wood debris is material with butt end diameter <2cm and length >50cm.
 *evergreen sites are sampled 1x every 1-2 months, and deciduous forest sites are sampled frequently 1x every 2 weeks
 *Litter and fine woody debris data can be used to calculate aboveground net primary productivity and aboveground biomass at the plot site. Also, this data can provide information about vegetation carbon fluxes over time.
+
+
 
 ## Obtain basic summaries of your data (Neonics)
 
@@ -81,9 +77,13 @@ summary.factor(Neonics$Effect)
 
 ```{r}
 
-summary(as.factor(Neonics$Species.Common.Name))
+summary.factor(Neonics$Species.Common.Name)
+#I tried using summary first. I did not think this was the best format because it categorized them alphabetically, and I would have to go through them to find what count was highest. For this many species to look through, it did not make sense to go about it this way.
 
-# Here, I was able to sort the species from highest to lowest. The 6 most commonly studied species are are all species of bees (other than parasitic wasp. Bees would be of interest over other insects because bees are pollinators and are valuable components of the ecosystem. The use of neonicotinoids may affect bees and therefore, affect how crops and other plants are pollinated. Finally, parasitic wasps may be studied to see if neonicotinoids could actually kill these, as they are pests.
+
+sort(table(Neonics$Species.Common.Name))
+
+#By using the sort feature, I was able to sort the species from lowest to highest. Scrolling to the bottom of the list, I am able to see the 6 most studied species. 
 
 ```
 
@@ -102,20 +102,17 @@ class(Neonics$Conc.1..Author.)
 
 9. Using `geom_freqpoly`, generate a plot of the number of studies conducted by publication year. 
 ```{r}
-ggplot(Neonics, aes(Publication.Year)) +geom_freqpoly(aes(group=Test.Location), bin=10)
-ggplot(Neonics, aes(Publication.Year)) +geom_freqpoly(aes(group=Test.Location))
-
+ggplot(Neonics) + geom_freqpoly(aes(x=Publication.Year), bins=40, color= "limegreen")
 ```
 
 10. Reproduce the same graph but now add a color aesthetic so that different Test.Location are displayed as different colors.
 ```{r}
-ggplot(Neonics, aes(Publication.Year)) +geom_freqpoly(aes(group=Test.Location, color=Test.Location, bin=10))
-
+ggplot(Neonics) +geom_bar(aes(x=Test.Location))
 ```
 
 Interpret this graph. What are the most common test locations, and do they differ over time?
 
-> Answer: The most common test location is in the lab. There are much more lab tests done as time goes on. In the 1980s, when the data begins, there are few to no lab tests. However, around 2015, there are almost 700 lab tests completed as shown by the purple on the graph.
+> Answer: 
 
 11. Create a bar graph of Endpoint counts. What are the two most common end points, and how are they defined? Consult the ECOTOX_CodeAppendix for more information. 
 
@@ -142,23 +139,26 @@ Litter$collectDate <- as.Date(Litter$collectDate, format= "%Y-%m-%d")
 class(Litter$collectDate)
 #Here, I used the as.Date function to change the date in character form to the date in Date form so that the computer will recognize this. Then, to make sure that the change was made, I checked and it shows that the class of the collectDate data is now "Date"
 
+unique(Litter$collectDate)
+
 ```
 
 13. Using the `unique` function, determine how many plots were sampled at Niwot Ridge. How is the information obtained from `unique` different from that obtained from `summary`?
 
 ```{r}
+
 unique(Litter$plotID)
-summary(Litter)
 
 ```
 
-> Answer: There are 12 plots sampled at Niwot Ridge. Unique tells us how many unique plots were sampled. The summary function just gives us the number of total samples taken.
+> Answer: There are 12 plots sampled at Niwot Ridge. Additionally, unique tells us how many unique values there are in this column. Summary gives us the total number of plot observations.
 
 14. Create a bar graph of functionalGroup counts. This shows you what type of litter is collected at the Niwot Ridge sites. Notice that litter types are fairly equally distributed across the Niwot Ridge sites.
 ```{r}
 
 ggplot(Litter, aes(x=functionalGroup)) +geom_bar()
 #counts of records in each functionalGroup category
+
 
 ```
 
