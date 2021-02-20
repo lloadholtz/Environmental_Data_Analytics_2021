@@ -21,7 +21,7 @@ Effective data visualization depends on purposeful choices about graph types. Th
 ```{r, message = FALSE, warning = FALSE}
 getwd()
 library(tidyverse)
-#install.packages("ggridges")
+install.packages("ggridges")
 library(ggridges)
 
 PeterPaul.chem.nutrients <- 
@@ -50,17 +50,17 @@ ggplot has only a few rules:
 
 Here are some commonly used layers for plotting in ggplot: 
 
-* geom_bar
+* geom_bar 
 * geom_histogram
-* geom_freqpoly
+* geom_freqpoly 
 * geom_boxplot
 * geom_violin
 * geom_dotplot
 * geom_density_ridges
 * geom_point
-* geom_errorbar
+* geom_errorbar - make a trendline 
 * geom_smooth
-* geom_line
+* geom_line 
 * geom_area
 * geom_abline (plus geom_hline and geom_vline)
 * geom_text
@@ -77,6 +77,8 @@ Here are some commonly used aesthetic types that can be manipulated in ggplot:
 ### Plotting continuous variables over time: Scatterplot and Line Plot
 
 ```{r, fig.height = 3, fig.width = 4, warning = FALSE}
+#this line can be done inside the R code line but doing it up here will apply it to any gg plot in this chunk
+
 # Scatterplot
 ggplot(EPAair, aes(x = Date, y = Ozone)) + 
   geom_point()
@@ -84,6 +86,7 @@ ggplot(EPAair, aes(x = Date, y = Ozone)) +
 O3plot <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone))
 print(O3plot)
+#store the plot in an object, then print the object 
 
 # Fix this code
 O3plot2 <- ggplot(EPAair) +
@@ -138,7 +141,7 @@ print(lightvsDO)
 lightvsDOfixed <- 
   ggplot(PeterPaul.chem.nutrients, aes(x = irradianceWater, y = dissolvedOxygen)) +
   geom_point() +
-  xlim(0, 250) +
+  xlim(0, 2500) +
   ylim(0, 20)
 print(lightvsDOfixed)
 

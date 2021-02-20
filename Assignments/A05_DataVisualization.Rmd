@@ -1,6 +1,6 @@
 ---
 title: "Assignment 5: Data Visualization"
-author: "Student Name"
+author: "Logan Loadholtz"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -34,8 +34,29 @@ the processed data file for the Niwot Ridge litter dataset.
 
 ```{r}
 #1 
+getwd()
+library(tidyverse)
+install.packages("cowplot")
+library(cowplot)
+
+
+
+NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed <- read_csv("Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv")
+
+
+
+NTL_LTER_Lake_Nutrients_PeterPaulGathered_Processed <- read_csv("Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaulGathered_Processed.csv")
+
+
+NEON_NIWO_Litter_mass_trap_Processed <- read_csv("Data/Processed/NEON_NIWO_Litter_mass_trap_Processed.csv")
+
 
 #2 
+
+class(NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed$sampledate)
+class(NTL_LTER_Lake_Nutrients_PeterPaulGathered_Processed$sampledate)
+class(NEON_NIWO_Litter_mass_trap_Processed$collectDate)
+#All three datasets are reading the dates as "date".
 
 ```
 ## Define your theme
@@ -43,6 +64,11 @@ the processed data file for the Niwot Ridge litter dataset.
 
 ```{r}
 
+MyDefaultTheme <- theme_classic(base_size = 13) +
+  theme(axis.text = element_text(color = "blue"),
+        legend.position = "top")
+
+theme_set(MyDefaultTheme)
 
 ```
 
@@ -52,6 +78,16 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 4. [NTL-LTER] Plot total phosphorus (`tp_ug`) by phosphate (`po4`), with separate aesthetics for Peter and Paul lakes. Add a line of best fit and color it black. Adjust your axes to hide extreme values.
 
 ```{r}
+Plot1_Phos <- ggplot(NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed, aes(x= po4, y=tp_ug)) +
+  geom_point() +
+  geom_smooth(method = lm) +
+  #xlim(0,46) +
+  labs(title="Plot of Total Phosphorus by Phosphate",
+  x="Phosphate",
+  y="Total Phosphorus")
+  
+
+print(Plot1_Phos) 
 
 
 ```
@@ -60,7 +96,29 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 5. [NTL-LTER] Make three separate boxplots of (a) temperature, (b) TP, and (c) TN, with month as the x axis and lake as a color aesthetic. Then, create a cowplot that combines the three graphs. Make sure that only one legend is present and that graph axes are aligned.
 
 ```{r}
+#Boxplot1_temp <- ggplot(NTL_LTER_Lake_Nutrients_PeterPaul_Processed, aes(x= month, y=temp)) +
+  geom_boxplot(aes(color="lakename")) +
+  labs(title="Temperature by Month",
+  x="Month",
+  y="Temperature")
 
+print(Boxplot1_temp)
+
+#Boxplot2_TP <- ggplot(NTL_LTER_Lake_Nutrients_PeterPaul_Processed, aes(x= month, y=tp_ug) +
+  geom_boxplot(aes(color="lakename")) +
+  labs(title="Total Phosphorus by Month",
+  x="Month",
+  y="Total Phosphorus")
+
+print(Boxplot2_TP)
+
+#Boxplot3_TN <- ggplot(NTL_LTER_Lake_Nutrients_PeterPaul_Processed, aes(x= month, y=tn_ug)) +
+  geom_boxplot(aes(color="lakename")) +
+  labs(title="Total Nitrogen by Month",
+  x="Month",
+  y="Total Nitrogen")
+
+print(Boxplot3_TN)
 
 ```
 
@@ -74,7 +132,21 @@ Question: What do you observe about the variables of interest over seasons and b
 
 ```{r}
 
+Plot6_NiwotRidge <- ggplot(subset(NEON_NIWO_Litter_mass_trap_Processed, 
+                                  functionalGroup == "Needles")) +
+  geom_point(aes(x=collectDate, y=dryMass, color=nlcdClass))
+
+print(Plot6_NiwotRidge)
+
+
+Plot7_NiwotRidge <- ggplot(subset(NEON_NIWO_Litter_mass_trap_Processed, 
+                                  functionalGroup == "Needles")) +
+  geom_point(aes(x=collectDate, y=dryMass)) +
+  facet_wrap(vars(nlcdClass), nrow=3)
+
+print(Plot7_NiwotRidge)
+
 ```
 Question: Which of these plots (6 vs. 7) do you think is more effective, and why? 
 
-> Answer:
+> Answer: I think plot 7 is more effective becuase it displays the data more clearly in a way that is easier for the reader to comprehend. Plot 6 combines all three classes, and even though they are separated by color, it's still a little difficult to really see what is being displayed, especially if you want to analyze one class. Plot 7 is much more easy to read because the classes are separated, but even though they are separated, the years line up at the bottom for all 3 so you can still compare each one over time. Plot 7 allows the reader to easily analyze each class over time.
