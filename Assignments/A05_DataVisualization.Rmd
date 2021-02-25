@@ -34,29 +34,44 @@ the processed data file for the Niwot Ridge litter dataset.
 
 ```{r}
 #1 
-getwd()
+#getwd()
 library(tidyverse)
-install.packages("cowplot")
+#install.packages("cowplot")
 library(cowplot)
 
+NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed <- read.csv("./Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv",stringsAsFactors = FALSE)
 
+NTL_LTER_Lake_Nutrients_PeterPaulGathered_Processed <- read.csv("./Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaulGathered_Processed.csv",stringsAsFactors = FALSE)
 
-NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed <- read_csv("Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv")
-
-
-
-NTL_LTER_Lake_Nutrients_PeterPaulGathered_Processed <- read_csv("Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaulGathered_Processed.csv")
-
-
-NEON_NIWO_Litter_mass_trap_Processed <- read_csv("Data/Processed/NEON_NIWO_Litter_mass_trap_Processed.csv")
+NEON_NIWO_Litter_mass_trap_Processed <- read.csv("./Data/Processed/NEON_NIWO_Litter_mass_trap_Processed.csv",stringsAsFactors = FALSE)
 
 
 #2 
-
 class(NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed$sampledate)
 class(NTL_LTER_Lake_Nutrients_PeterPaulGathered_Processed$sampledate)
 class(NEON_NIWO_Litter_mass_trap_Processed$collectDate)
-#All three datasets are reading the dates as "date".
+
+#All three datasets are NOT reading the dates as "date" instead as "character",
+#will need to convert below.
+
+
+NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed$sampledate <- as.Date(NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed$sampledate ,
+                                                                            format= "%Y-%m-%d")
+
+class(NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed$sampledate)
+
+
+NTL_LTER_Lake_Nutrients_PeterPaulGathered_Processed$sampledate <- as.Date(NTL_LTER_Lake_Nutrients_PeterPaulGathered_Processed$sampledate,
+                                                                          format = "%Y-%m-%d")
+
+class(NTL_LTER_Lake_Nutrients_PeterPaulGathered_Processed$sampledate)
+
+
+NEON_NIWO_Litter_mass_trap_Processed$collectDate <- as.Date(NEON_NIWO_Litter_mass_trap_Processed$collectDate,
+                                                            format = "%Y-%m-%d")
+
+class(NEON_NIWO_Litter_mass_trap_Processed$collectDate)
+
 
 ```
 ## Define your theme
@@ -78,10 +93,11 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 4. [NTL-LTER] Plot total phosphorus (`tp_ug`) by phosphate (`po4`), with separate aesthetics for Peter and Paul lakes. Add a line of best fit and color it black. Adjust your axes to hide extreme values.
 
 ```{r}
-Plot1_Phos <- ggplot(NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed, aes(x= po4, y=tp_ug)) +
+Plot1_Phos <- ggplot(NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed,
+                     aes(x= po4, y=tp_ug,color=lakename )) +
   geom_point() +
-  geom_smooth(method = lm) +
-  #xlim(0,46) +
+  geom_smooth(method = lm, color="black") +
+  xlim(0,46) +
   labs(title="Plot of Total Phosphorus by Phosphate",
   x="Phosphate",
   y="Total Phosphorus")
@@ -96,30 +112,64 @@ print(Plot1_Phos)
 5. [NTL-LTER] Make three separate boxplots of (a) temperature, (b) TP, and (c) TN, with month as the x axis and lake as a color aesthetic. Then, create a cowplot that combines the three graphs. Make sure that only one legend is present and that graph axes are aligned.
 
 ```{r}
-#Boxplot1_temp <- ggplot(NTL_LTER_Lake_Nutrients_PeterPaul_Processed, aes(x= month, y=temp)) +
-  geom_boxplot(aes(color="lakename")) +
+
+NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed$month <- as.factor(NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed$month)
+#Here I changed month to factor so it would show up as separate boxplots 
+
+class(NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed$month)
+
+
+
+Boxplot1_temp <- ggplot(NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed,
+                        aes(x= month, y=temperature_C, color=lakename)) +
+  geom_boxplot() +
   labs(title="Temperature by Month",
   x="Month",
-  y="Temperature")
+  y="Temperature")+
+  theme(legend.position = "none")
 
 print(Boxplot1_temp)
 
-#Boxplot2_TP <- ggplot(NTL_LTER_Lake_Nutrients_PeterPaul_Processed, aes(x= month, y=tp_ug) +
-  geom_boxplot(aes(color="lakename")) +
+
+Boxplot2_TP <- ggplot(NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed,
+                      aes(x= month, y=tp_ug, color=lakename)) +
+  geom_boxplot() +
   labs(title="Total Phosphorus by Month",
   x="Month",
-  y="Total Phosphorus")
+  y="Total Phosphorus")+
+  theme(legend.position = "none")
 
 print(Boxplot2_TP)
 
-#Boxplot3_TN <- ggplot(NTL_LTER_Lake_Nutrients_PeterPaul_Processed, aes(x= month, y=tn_ug)) +
-  geom_boxplot(aes(color="lakename")) +
+Boxplot3_TN <- ggplot(NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed,
+                      aes(x= month, y=tn_ug, color=lakename)) +
+  geom_boxplot() +
   labs(title="Total Nitrogen by Month",
   x="Month",
-  y="Total Nitrogen")
+  y="Total Nitrogen")+
+  theme(legend.position = "none" )
 
 print(Boxplot3_TN)
 
+Boxplot3_TN_withlegend <- ggplot(NTL_LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed,
+                                 aes(x= month, y=tn_ug, color=lakename)) +
+  geom_boxplot() +
+  labs(title="Total Nitrogen by Month",
+  x="Month",
+  y="Total Nitrogen")+
+  theme(legend.position = "bottom" )
+
+legend_Cowplot <- get_legend(Boxplot3_TN_withlegend)
+
+
+
+
+CowPlot <- plot_grid(Boxplot1_temp, Boxplot2_TP, Boxplot3_TN_withlegend,
+                     nrow = 3, align = 'h', rel_heights = c(1.25, 1))
+  
+  
+
+print(CowPlot)
 ```
 
 Question: What do you observe about the variables of interest over seasons and between lakes? 
