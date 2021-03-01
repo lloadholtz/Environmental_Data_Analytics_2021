@@ -17,6 +17,7 @@ editor_options:
 
 ## Set up
 ```{r, message = FALSE}
+install.packages("agricolae")
 library(tidyverse)
 library(agricolae)   
 
@@ -67,6 +68,8 @@ Are Ozone levels below the threshold for "good" AQI index (0-50)?
 > Exercise 1: State the hypotheses for testing mean of AQI index.
 
 > Answer: 
+H0: mu >= 50 ppm
+Ha: mu= <50 pm
 
 
 ```{r}
@@ -94,7 +97,7 @@ print(Ozone.plot)
 
 Write a sentence or two about the results of this test. Include both the results of the test and an interpretation that puts the findings in context of the research question.
 
-> 
+> On average, ozone measured in North Carolina is less than 50 ppm (t-test, df= 6829, p<0.001).
 
 ### Two-sample t-test
 
@@ -163,11 +166,15 @@ For the NTL-LTER dataset, can we predict PM2.5 from Ozone?
 
 #Exercise 3: Run a linear regression PM2.5 by Ozone. Find the p-value and R-squared value. 
 
-
+the_model <- lm(data=EPAair, PM2.5 ~ Ozone)
+summary(the_model)
 
 #Exercise 4: Build a scatterplot. Add a line and standard error for the linear regression. Add the regression equation to the plot
 
-
+ggplot(data=EPAair, aes(x= Ozone, y= PM2.5))+
+  geom_point()+
+  geom_smooth(method = "lm")
+  
 
 ```
 
