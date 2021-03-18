@@ -34,8 +34,16 @@ The packages we'll need for this lesson are below. Install as necessary and ensu
 #Import the tidyverse library 
 library(tidyverse, quietly = TRUE)
 
+install.packages("sf")
+
 library(sf)
+
+install.packages("leaflet")
+
 library(leaflet)
+
+install.packages("mapview")
+
 library(mapview)
 ```
 
@@ -119,7 +127,7 @@ See <http://rstudio.github.io/leaflet/> for more info
 ```{r plot.with.leaflet}
 
 #Create the map and add Tiles
-myMap  <- leaflet(data=EPAair_PM_avg) %>% 
+myMap2  <- leaflet(data=EPAair_PM_avg) %>% 
   addTiles() %>% 
   addCircleMarkers(~SITE_LONGITUDE,~SITE_LATITUDE,
                    radius=(~meanPM*2),
@@ -127,7 +135,7 @@ myMap  <- leaflet(data=EPAair_PM_avg) %>%
                    fillOpacity = 0.3,
                    popup = ~as.character(`Site.Name`))
 #Show the map
-myMap
+myMap2
 ```
 
 There's much more we can do to make these maps prettier and more powerful, but we'll come back to that. But take time to notice the power of mapping: like previous plots, we are able to interpret patterns in our dataset, but in geographically mapping our data, we can visualize these patterns in a much richer context by viewing them next to other spatial datasets (e.g. our basemaps). Ok, let's continue talking about spatial features in the vector model...
@@ -267,7 +275,7 @@ m
 
 # Save the map
 library(htmlwidgets)
-#saveWidget(m, file='m.html')
+saveWidget(m, file='m.html')
 
 ```
 
