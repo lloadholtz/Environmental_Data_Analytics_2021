@@ -245,7 +245,7 @@ scrape.it <- function(the_year, the_facility){
            Date = my(paste(Month,"-",Year)))
   
   #Pause for a moment - scraping etiquette
-  #Sys.sleep(1) #uncomment this if you are doing bulk scraping!
+  Sys.sleep(1) #uncomment this if you are doing bulk scraping!
   
   #Return the dataframe
   return(df_withdrawals)
